@@ -1,0 +1,1 @@
+commandsname = ["saamometer"]
