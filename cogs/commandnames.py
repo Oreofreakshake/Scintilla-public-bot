@@ -1,1 +1,1 @@
-commandsname = ["saamometer"]
+commandsname = ["saamometer", "prayertime"]
