@@ -9,9 +9,14 @@ from telebot.types import (
     ReplyKeyboardRemove,
     KeyboardButton,
 )
-from api import prayer
+from api import prayerDB
+from api import corona
 
 from prettytable import PrettyTable
+
+from datetime import datetime, date
+import pytz
+
 
 n = 1  # to make it easier for you to read the list, just ignore 0 and start from 1
 
@@ -25,7 +30,8 @@ class Commands:
             message.chat.id,
             f"""These are the commands you can try for now! 
 /{commandnames.commandsname[1-n]} 
-/{commandnames.commandsname[2-n]} 
+/{commandnames.commandsname[2-n]}
+/{commandnames.commandsname[3-n]} 
          """,
         )
 
@@ -41,70 +47,96 @@ class Commands:
 
     # -----------------------------------------------------------------------------------------------
 
-    def prayertime(self, message):  # ✅ (Will update and make it better later)
+    def prayertime(self, message):  # ✅
         add_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        button1 = types.KeyboardButton("Fajar")
-        button2 = types.KeyboardButton("Dhuhar")
-        button3 = types.KeyboardButton("Asr")
-        button4 = types.KeyboardButton("Maghrib")
-        button5 = types.KeyboardButton("Isha")
-        button6 = types.KeyboardButton("Every prayer")
-        add_markup.add(button1, button2, button3, button4, button5, button6)
+
+        Prayerbutton = ["Male'", "Addu"]
+        buttonArray = []
+
+        for items in range(len(Prayerbutton)):
+            button = types.KeyboardButton(Prayerbutton[items])
+            buttonArray.append(button)
+
+        add_markup.add(
+            buttonArray[0],
+            buttonArray[1],
+        )
+
         self.bot.send_message(
             message.chat.id,
-            "What prayer time do you want to know?",
+            "For which location?",
             reply_markup=add_markup,
         )
 
     def bot_reply_to_prayertime(self, message):
-        replyFajar = f"you have around {prayer.TimeLeftFajar} hours left"
-        replyDhuhar = f"you have around {prayer.TimeLeftDhuhar} hours left"
-        replyAsr = f"you have around {prayer.TimeLeftAsr} hours left"
-        replyMaghrib = f"you have around {prayer.TimeLeftMaghrib} hours left"
-        replyIsha = f"you have around {prayer.TimeLeftIsha} hours left"
 
-        if prayer.TimeLeftFajar == 1:
-            replyFajar = "It's almost time now, be ready and make sure you pray!"
-        if prayer.TimeLeftDhuhar == 1:
-            replyDhuhar = "It's almost time now, be ready and make sure you pray!"
-        if prayer.TimeLeftAsr == 1:
-            replyAsr = "It's almost time now, be ready and make sure you pray!"
-        if prayer.TimeLeftMaghrib == 1:
-            replyMaghrib = "It's almost time now, be ready and make sure you pray!"
-        if prayer.TimeLeftIsha == 1:
-            replyIsha = "It's almost time now, be ready and make sure you pray!"
+        timeinmv = pytz.timezone("Indian/Maldives")
 
-        Fajar = f"Fajar time is {prayer.Fajar12hour}\n{replyFajar}"
-        Dhuhar = f"Dhuhar time is {prayer.Dhuhar12hour}\n{replyDhuhar}"
-        Asr = f"Asr time is {prayer.Asr12hour}\n{replyAsr}"
-        Maghrib = f"Maghrib time is {prayer.Maghrib12hour}\n{replyMaghrib}"
-        Isha = f"Isha time is {prayer.Isha12hour}\n{replyIsha}"
+        timer = datetime.now(timeinmv).strftime("%H:%M").lower()
 
-        DataGiven = PrettyTable(["Prayer", "Time"])
+        CurrentTime = f"{timer}"
 
-        DataGiven.add_row(["Fathis", prayer.Fajar12hour])
-        DataGiven.add_row(["Dhuhar", prayer.Dhuhar12hour])
-        DataGiven.add_row(["Asr", prayer.Asr12hour])
-        DataGiven.add_row(["Maghrib", prayer.Maghrib12hour])
-        DataGiven.add_row(["Isha", prayer.Isha12hour])
+        iterateList = ["Fajuru", "Dhuhr", "Asr", "Maghrib", "Isha"]
+        day = prayerDB.get_day()
 
-        if message.text == "Fajar":
-            self.bot.reply_to(message, Fajar, reply_markup=ReplyKeyboardRemove())
-        if message.text == "Dhuhar":
-            self.bot.reply_to(message, Dhuhar, reply_markup=ReplyKeyboardRemove())
-        if message.text == "Asr":
-            self.bot.reply_to(message, Asr, reply_markup=ReplyKeyboardRemove())
-        if message.text == "Maghrib":
-            self.bot.reply_to(message, Maghrib, reply_markup=ReplyKeyboardRemove())
-        if message.text == "Isha":
-            self.bot.reply_to(message, Isha, reply_markup=ReplyKeyboardRemove())
-        if message.text == "Every prayer":
+
+        #--------driver code---------
+
+        if message.text == "Male'":
+                prayerTimes = prayerDB.getPrayerTime(57, day)
+
+                timeArray = []
+                for i in iterateList:
+                    timeArray.append(prayerTimes[i])
+
+                DataGivenM = PrettyTable(["Prayer", "Time (Male')"])
+
+                DataGivenM.add_row(["Fajuru", timeArray[0]])
+                DataGivenM.add_row(["Dhuhr ", timeArray[1]])
+                DataGivenM.add_row(["Asr", timeArray[2]])
+                DataGivenM.add_row(["Maghrib", timeArray[3]])
+                DataGivenM.add_row(["Isha", timeArray[4]])
+
+                self.bot.send_message(
+                    message.chat.id,
+                    f"```{DataGivenM}```",
+                    reply_markup=ReplyKeyboardRemove(),
+                    parse_mode="Markdown",
+                )
+
+        if message.text == "Addu":
+            prayerTimes = prayerDB.getPrayerTime(82, day)
+
+            timeArray = []
+            for i in iterateList:
+                timeArray.append(prayerTimes[i])
+
+            DataGivenA = PrettyTable(["Prayer", "Time (Addu)"])
+
+            DataGivenA.add_row(["Fajuru", timeArray[0]])
+            DataGivenA.add_row(["Dhuhr ", timeArray[1]])
+            DataGivenA.add_row(["Asr", timeArray[2]])
+            DataGivenA.add_row(["Maghrib", timeArray[3]])
+            DataGivenA.add_row(["Isha", timeArray[4]])
+
             self.bot.send_message(
                 message.chat.id,
-                f"```{DataGiven}```",
+                f"```{DataGivenA}```",
                 reply_markup=ReplyKeyboardRemove(),
                 parse_mode="Markdown",
             )
 
+            
 
-# -----------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------
+
+    def covid(self, message):
+        data = f"""*This data is only valid in Maldives*\n
+Total Cases : ```{corona.totalCases}```
+Total Deaths : ```{corona.totalDeaths}```
+Active : ```{corona.active}```
+Recovered : ```{corona.recovered}```
+Critical : ```{corona.critical}```
+        """
+
+        self.bot.send_message(message.chat.id, f"{data}", parse_mode="Markdown")

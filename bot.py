@@ -1,11 +1,17 @@
-import os
 import telebot
+import os
+# my lib
 from cogs import commands
+from api import prayerDB
+from api import corona
+
+
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 
+#you can use env for token
 bot = telebot.TeleBot(TOKEN)
 
 
@@ -32,8 +38,16 @@ def command_two(message):
     command.prayertime(message)
 
 
+# covid command
+@bot.message_handler(commands=["covid"])  # ✅
+def command_three(message):
+    command = commands.Commands(bot)
+    command.covid(message)
+
+
+# prayer command reply
 @bot.message_handler(content_types=["text"])
-def bot_reply_to_prayertime(message):
+def bot_reply_to_island(message):
     command = commands.Commands(bot)
     command.bot_reply_to_prayertime(message)
 
@@ -44,3 +58,19 @@ if __name__ == "__main__":
         bot.infinity_polling()
     except:
         print("run time error")
+
+# ==========================================================================================================================
+# code i might need later
+# def gen_markup(): ❌
+#    markup = types.InlineKeyboardMarkup()
+#    markup.row_width = 2
+#    markup.add(
+#        types.InlineKeyboardButton(text="something", callback_data="something"),
+#    )
+#    return markup
+#
+#
+# @bot.callback_query_handler(func=lambda message: True)
+# def callback_query(call):
+#    if call.data == "something":
+#        bot.answer_callback_query(call.id, text="You Clicked")

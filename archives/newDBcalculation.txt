@@ -1,0 +1,97 @@
+CurrenttimeHour = int(CurrentTime[:2])  # current time first 2 digit
+        CurrentTimeMinute = int(CurrentTime[-2:])  # last two
+
+        hours = []  # every prayer first 2 digit
+        minutes = []  # every prayer last two
+
+        for item in range(len(iterateList)):
+            time = timeArray[item]
+            hour = int(time[:2])
+            minute = int(time[-2:])
+
+            hours.append(hour)
+            minutes.append(minute)
+
+        if CurrenttimeHour <= hours[0]:
+            TimeLeftFajuru = CurrenttimeHour - hours[0]
+        else:
+            TimeLeftFajuru = (CurrenttimeHour - hours[0]) - 24
+
+        if CurrenttimeHour <= hours[1]:
+            TimeLeftDhuhr = CurrenttimeHour - hours[1]
+        else:
+            TimeLeftDhuhr = (CurrenttimeHour - hours[1]) - 24
+
+        if CurrenttimeHour <= hours[2]:
+            TimeLeftAsr = CurrenttimeHour - hours[2]
+        else:
+            TimeLeftAsr = (CurrenttimeHour - hours[2]) - 24
+
+        if CurrenttimeHour <= hours[3]:
+            TimeLeftMaghrib = CurrenttimeHour - hours[3]
+        else:
+            TimeLeftMaghrib = (CurrenttimeHour - hours[3]) - 24
+
+        if CurrenttimeHour <= hours[4]:
+            TimeLeftIsha = CurrenttimeHour - hours[4]
+        else:
+            TimeLeftIsha = (CurrenttimeHour - hours[4]) - 24
+
+        ListOfTimeLeft = []
+
+        ListOfTimeLeft.append(TimeLeftFajuru)
+        ListOfTimeLeft.append(TimeLeftDhuhr)
+        ListOfTimeLeft.append(TimeLeftAsr)
+        ListOfTimeLeft.append(TimeLeftMaghrib)
+        ListOfTimeLeft.append(TimeLeftIsha)
+
+        hourDiff = []
+
+        for time in ListOfTimeLeft:
+            if time < 0:
+                time = -time
+                hourDiff.append(time)
+            else:
+                time = time
+                hourDiff.append(time)
+
+        # final time difference <-----
+        TimeLeftFajuru = hourDiff[0]
+        TimeLeftDhuhr = hourDiff[1]
+        TimeLeftAsr = hourDiff[2]
+        TimeLeftMaghrib = hourDiff[3]
+        TimeLeftIsha = hourDiff[4]
+
+        DataGiven = PrettyTable(["Prayer", "Time (Male')"])
+
+        DataGiven.add_row(["Fajuru", timeArray[0]])
+        DataGiven.add_row(["Dhuhr ", timeArray[1]])
+        DataGiven.add_row(["Asr", timeArray[2]])
+        DataGiven.add_row(["Maghrib", timeArray[3]])
+        DataGiven.add_row(["Isha", timeArray[4]])
+
+        if TimeLeftFajuru == 0:
+            leftminutes = minutes[0] - CurrentTimeMinute
+            Fajuru = f"You have {leftminutes} minutes left! make sure you pray"
+        if TimeLeftDhuhr == 0:
+            leftminutes = minutes[1] - CurrentTimeMinute
+            Dhuhr = f"You have {leftminutes} minutes left! make sure you pray"
+        if TimeLeftAsr == 0:
+            leftminutes = minutes[2] - CurrentTimeMinute
+            Asr = f"You have {leftminutes} minutes left! make sure you pray"
+        if TimeLeftMaghrib == 0:
+            leftminutes = minutes[3] - CurrentTimeMinute
+            Maghrib = f"You have {leftminutes} minutes left! make sure you pray"
+        if TimeLeftIsha == 0:
+            leftminutes = minutes[4] - CurrentTimeMinute
+            Isha = f"You have {leftminutes} minutes left! make sure you pray"
+
+        Fajuru = (
+            f"Fajuru time is {timeArray[0]}\nyou have around {TimeLeftFajuru} hours"
+        )
+        Dhuhr = f"Fajuru time is {timeArray[1]}\nyou have around {TimeLeftDhuhr} hours"
+        Asr = f"Fajuru time is {timeArray[2]}\nyou have around {TimeLeftAsr} hours"
+        Maghrib = (
+            f"Fajuru time is {timeArray[3]}\nyou have around {TimeLeftMaghrib} hours"
+        )
+        Isha = f"Fajuru time is {timeArray[4]}\nyou have around {TimeLeftIsha} hours"
